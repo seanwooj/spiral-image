@@ -2,43 +2,50 @@ import processing.pdf.*;
 import java.util.Iterator;
 
 PImage IMG;
-float R_INC;
+float R_INC = 3;
 int LINECOUNT = 3;
 PVector OFFSET;
-float MAX_WIDTH = 5;
+float MAX_WIDTH = 3;
 
 void settings() {
   size(500,500);
 }
 
 void setup() {
-  background(255);
-  noFill();
-  strokeWeight(1);
-  smooth();
-  
-  IMG = loadImage("image.jpeg");
-  R_INC = 3; // increment between "rings"
-  OFFSET = new PVector(height/2, width/2);
-  Ring r = new Ring(300);
-  r.display();
+  String frameWord = "image-" + timestamp() + ".pdf";
+  beginRecord(PDF, frameWord);
+    background(255);
+    noFill();
+    strokeWeight(.5);
+    smooth();
+    
+    IMG = loadImage("image.jpeg");
+    OFFSET = new PVector(height/2, width/2);
+    Radial r = new Radial(2);
+    r.display();
+  endRecord();
 }
 
 
 class Radial {
   ArrayList<Ring> rings;
-  float startR; // unclear if needed
-  float endR; // unclear if needed
+  float startR;
+  float endR;
   
-  Radial() {
-  
+  Radial(float startR_) {
+    startR = startR_;
+    endR = width/2;
+    rings = new ArrayList<Ring>();
   }
   
   void createRings() {
-  
+    for(float i = startR; i <= endR; i += R_INC) {
+      rings.add(new Ring(i));
+    }
   }
   
   void display() {
+    createRings();
     Iterator<Ring> it = rings.iterator();
     while(it.hasNext()){
       it.next().display();
@@ -115,8 +122,6 @@ class Ring {
         ringCoords.get(i).add(rv.vectors.get(i));
       }
     }
-    
-    
   }
   
   void display() {
@@ -195,4 +200,19 @@ class RingVector {
       
     }
   }
+}
+
+
+String timestamp() {
+  int[] dateNumbers = new int[6];
+  dateNumbers[0] = year();
+  dateNumbers[1] = month();
+  dateNumbers[2] = day();
+  dateNumbers[3] = hour();
+  dateNumbers[4] = minute();
+  dateNumbers[5] = second();
+
+  String joinedTimestamp = join(nf(dateNumbers, 2), "");
+
+  return joinedTimestamp;
 }
