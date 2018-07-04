@@ -1,3 +1,5 @@
 *.pdf
 *.svg
 *.jpg
+*.ai
+.DS_Store

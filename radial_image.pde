@@ -2,7 +2,7 @@ import processing.pdf.*;
 import java.util.Iterator;
 
 PImage IMG;
-float R_INC = 3;
+float R_INC = 4;
 int LINECOUNT = 3;
 PVector OFFSET;
 float MAX_WIDTH = 3;
@@ -16,10 +16,10 @@ void setup() {
   beginRecord(PDF, frameWord);
     background(255);
     noFill();
-    strokeWeight(.5);
+    strokeWeight(1);
     smooth();
     
-    IMG = loadImage("image.jpeg");
+    IMG = loadImage("plant3.jpg");
     OFFSET = new PVector(height/2, width/2);
     Radial r = new Radial(2);
     r.display();
