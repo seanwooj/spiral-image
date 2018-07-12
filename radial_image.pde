@@ -2,86 +2,68 @@ import processing.pdf.*;
 import java.util.Iterator;
 
 PImage IMG;
-float R_INC = 4;
+float RES_DIVISOR = 1.2;
 int LINECOUNT = 3;
 PVector OFFSET;
-float MAX_WIDTH = 3;
+float MAX_WIDTH = 2.3;
+float STROKE = 3;
+String FILENAME = "butt2";
+
+// MAX WIDTH VALUES
+// 3 IS GOOD FOR SHARPIE FINELINER
+// Uniball Air
+// Res mult: .66
+// MaxWidth: 2.1
 
 void settings() {
   size(500,500);
 }
 
 void setup() {
-  String frameWord = "image-" + timestamp() + ".pdf";
+  String frameWord = "output/image-" + timestamp() + ".pdf";
   beginRecord(PDF, frameWord);
     background(255);
     noFill();
-    strokeWeight(1);
+    strokeWeight(STROKE);
     smooth();
-    
-    IMG = loadImage("plant3.jpg");
+    String filename = "input/" + FILENAME + ".jpg";
+    IMG = loadImage(filename);
     OFFSET = new PVector(height/2, width/2);
-    Radial r = new Radial(2);
+    Ring r = new Ring(1);
     r.display();
   endRecord();
 }
 
-
-class Radial {
-  ArrayList<Ring> rings;
-  float startR;
-  float endR;
-  
-  Radial(float startR_) {
-    startR = startR_;
-    endR = width/2;
-    rings = new ArrayList<Ring>();
-  }
-  
-  void createRings() {
-    for(float i = startR; i <= endR; i += R_INC) {
-      rings.add(new Ring(i));
-    }
-  }
-  
-  void display() {
-    createRings();
-    Iterator<Ring> it = rings.iterator();
-    while(it.hasNext()){
-      it.next().display();
-    }
-  }
-}
-
 class Ring {
-  float startAngle; // maybe redundant
-  float endAngle; // these may be redundant
   float startNoise;
-  float r;
+  float startR;
+  float currentR;
   float resolution;
+  float rInc;
   
   ArrayList<RingVector> ringVectors;
   ArrayList<ArrayList> ringCoords;
   
-  Ring(float r_) {
-    r = r_;
-    startAngle = 0;
-    endAngle = 2 * PI;
-    resolution = asin(1/r); // this is equivalent to a 1 pixel resolution (may be worth it to adjust this figure)
+  Ring(float startR_) {
+    startR = startR_;
   }
   
   void createRingVectors() {
     ringVectors = new ArrayList<RingVector>();
-    
-    for (float i = startAngle; i <= endAngle; i += resolution) {
-      float x = cos(i) * r;
-      float y = sin(i) * r; // not adding noise yet, this will be an improvement to add.
+    resolution = asin(1/currentR);
+    float i = 0;
+    for (currentR = startR; currentR <= width/2; currentR += (resolution / RES_DIVISOR)) {
+      resolution = asin(1/currentR);
+      float x = cos(i) * currentR;
+      float y = sin(i) * currentR; // not adding noise yet, this will be an improvement to add.
       PVector point = new PVector(x,y);
+      point.setMag(point.mag() + noise((i/resolution) / 50) * 2);
       point.add(OFFSET);
       
       float shadeWidth = calculateShading(point);
       RingVector rv = new RingVector(point, shadeWidth);
       ringVectors.add(rv);
+      i += resolution;
     }
     
     calculateRingVectors();
@@ -194,7 +176,7 @@ class RingVector {
       perpVector.setMag(endPoint).add(baseCoord);
       
       for(float i = -1; i <= 1; i += incrementer) {
-        println(PVector.lerp(baseCoord, perpVector, i));
+        //println(PVector.lerp(baseCoord, perpVector, i));
         vectors.add(PVector.lerp(baseCoord, perpVector, i));
       }
       
