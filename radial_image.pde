@@ -2,12 +2,12 @@ import processing.pdf.*;
 import java.util.Iterator;
 
 PImage IMG;
-float RES_DIVISOR = 1.2;
+float RES_DIVISOR = 1;
 int LINECOUNT = 3;
 PVector OFFSET;
-float MAX_WIDTH = 2.3;
+float MAX_WIDTH = 2.6;
 float STROKE = 3;
-String FILENAME = "butt2";
+String FILENAME = "body10";
 
 // MAX WIDTH VALUES
 // 3 IS GOOD FOR SHARPIE FINELINER
@@ -20,7 +20,7 @@ void settings() {
 }
 
 void setup() {
-  String frameWord = "output/image-" + timestamp() + ".pdf";
+  String frameWord = "output/" + FILENAME.toUpperCase() + "DIV" + floatToS(RES_DIVISOR) + "_MW" + floatToS(MAX_WIDTH) + ".pdf";
   beginRecord(PDF, frameWord);
     background(255);
     noFill();
@@ -32,6 +32,12 @@ void setup() {
     Ring r = new Ring(1);
     r.display();
   endRecord();
+}
+
+String floatToS(float f) {
+  String s = String.valueOf(f);
+  s = s.replace(".", "_");
+  return s;
 }
 
 class Ring {
